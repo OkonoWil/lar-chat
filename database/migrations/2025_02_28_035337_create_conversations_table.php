@@ -12,7 +12,6 @@ return new class extends Migration {
     {
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
-            ;
             $table->string('name');
             $table->foreignId('user_id1')->constrained('users');
             $table->foreignId('user_id2')->constrained('users');
