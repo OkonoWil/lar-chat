@@ -66,4 +66,33 @@ class Group extends Model
         return $this->belongsTo(Message::class, 'last_message_id');
     }
 
+    public static function getGroupsForUser(User|null $user)
+    {
+        return self::select(['groups.*', 'messages.content as last_message', 'messages.created_at as last_message_date'])
+            ->join('group_user', 'group_user.group_id', '=', 'groups.id')
+            ->leftJoin('messages', 'messages.id', '=', 'groups.last_message_id')
+            ->where('group_user.user_id', '=', $user->id)
+            ->orderByDesc('messages.created_at')
+            ->orderBy('groups.name')
+            ->get();
+    }
+
+    public  function toConversationArray()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'is_group' => true,
+            'is_user' => false,
+            'is_admin' => false,
+            'users' => $this->users,
+            'user_ids' => $this->users->pluck('id')->toArray(),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'last_message' => $this->last_message,
+            'last_message_date' => $this->last_message_date
+        ];
+    }
+
 }
